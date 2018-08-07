@@ -68,6 +68,34 @@ assert list(kv.items()) == [
 
 Set the `reverse` argument to True for the `keys()` and `items()` methods to sort in descending order.
 
+### DB persistency and concurrency
+
+The DB is created in a temporary directory by default but you can provide an alternative directory or re-use the temporary directory for persistency.
+
+Concurrent writes to the same DB is not supported.
+
+To support concurrent reads from multiple processes, use the SQLiteDB class which supports concurrent reads.
+
+```python
+kv = SQLiteDB()
+kv.set('a', 'foo')
+kv.set('c', 'bax')
+kv.set('b', 'baz')
+kv_dirname = kv.dirname
+kv.close()
+kv = SQLiteDB(dirname=kv_dirname)
+assert list(kv.keys()) == ['a', 'b', 'c']
+```
+
+### Bulk inserting data
+
+The SQLiteDB can be very slow when bulkd inserting data. You can use the insert method to insert efficiently in bulk.
+
+It accepts a `batch_size` parameter
+
+```python
+kv.insert({i: i for i in range(50000}.items())
+```
 
 ## Installing leveldb
 
